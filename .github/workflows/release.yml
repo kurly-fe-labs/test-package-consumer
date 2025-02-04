@@ -28,7 +28,7 @@ jobs:
       - name: Setup npmrc
         run: |
           echo @kurly-fe-labs:registry=https://npm.pkg.github.com  >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.TEST_GH_TOKEN }}" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.TEST_ORG_1 }}" >> .npmrc
 
       - name: Install Dependencies
         run: pnpm i
