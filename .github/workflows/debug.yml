@@ -3,7 +3,7 @@ name: Debug
 on:
   push:
     branches:
-      - main
+      - *
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
