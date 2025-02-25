@@ -19,8 +19,8 @@ jobs:
 
       - name: Debug workflow variablesc
         run: |
-          echo matrix.qa_env = ${{ github.qa_env }}
-          echo matrix.env = ${{ github.env }}
+          echo matrix.qa_env = ${{ matrix.qa_env }}
+          echo matrix.env = ${{ matrix.env }}
           echo github.workflow = ${{ github.workflow }}
           echo github.ref = ${{ github.ref }}
           echo github.action = ${{ github.action }}
