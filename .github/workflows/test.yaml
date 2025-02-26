@@ -2,11 +2,40 @@ name: Deploy to Test Environment
 
 on:
   push:
-    branches:
-      - ${{ vars.TEST_DEPLOY_BRANCH_NAME }}
+    branches: ['qa-*']
 
 jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    outputs:
+      SHOULD_DEPLOY: ${{ steps.check.outputs.SHOULD_DEPLOY }}
+      HOST_PREFIX: ${{ steps.check.outputs.HOST_PREFIX }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 전체 브랜치 정보를 가져오기 위해 필요
+
+      - name: Check if branch matches deployment target
+        id: check
+        run: |
+          CURRENT_BRANCH="${{ github.ref_name }}"
+          
+          QA1_BRANCH="${{ vars.QA1_DEV }}"
+          QA2_BRANCH="${{ vars.QA2_DEV }}"
+          
+          if [[ "$CURRENT_BRANCH" == "$QA1_BRANCH" ]]; then
+            echo "SHOULD_DEPLOY=true" >> $GITHUB_OUTPUT
+            echo "HOST_PREFIX=qa1" >> $GITHUB_OUTPUT
+          fi
+          if [[ "$CURRENT_BRANCH" == "$QA2_BRANCH" ]]; then
+            echo "SHOULD_DEPLOY=true" >> $GITHUB_OUTPUT
+            echo "HOST_PREFIX=qa2" >> $GITHUB_OUTPUT
+          fi
+
   deploy:
+    needs: check-branch
+    if: needs.check-branch.outputs.SHOULD_DEPLOY == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -15,3 +44,4 @@ jobs:
       - name: Deploy to test environment
         run: |
           echo "Deploying branch ${{ github.ref }} to test environment..."
+          echo "Host prefix: ${{ needs.check-branch.outputs.HOST_PREFIX }}"
